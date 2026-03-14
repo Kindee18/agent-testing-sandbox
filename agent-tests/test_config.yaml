@@ -1,0 +1,9 @@
+test_environment: sandbox
+target_domain: fragile-site.com
+timeout: 30
+extraction_targets:
+  - price
+  - availability
+  - title
+log_level: DEBUG
+s3_logging: true

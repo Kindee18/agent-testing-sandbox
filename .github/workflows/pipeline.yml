@@ -1,0 +1,60 @@
+name: AI Agent Sandbox Testing Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  sandbox-test:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: "us-east-1"
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: terraform
+
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -auto-approve
+        working-directory: terraform
+
+      - name: Extract Infrastructure Details
+        id: outputs
+        run: |
+          echo "INSTANCE_IP=$(terraform output -raw instance_public_ip)" >> $GITHUB_ENV
+          echo "S3_BUCKET=$(terraform output -raw s3_bucket_name)" >> $GITHUB_ENV
+        working-directory: terraform
+
+      - name: Wait for Cloud-Init
+        run: sleep 60 # wait for EC2 user_data to finish (Docker/Python install)
+
+      - name: Run Agent Tests on Sandbox
+        run: |
+          # In a real scenario, you'd use SSH or SSM here.
+          # Example using SSH:
+          # ssh -o StrictHostKeyChecking=no ubuntu@${{ env.INSTANCE_IP }} "mkdir -p app"
+          # scp -r . ubuntu@${{ env.INSTANCE_IP }}:~/app
+          # ssh ubuntu@${{ env.INSTANCE_IP }} "cd ~/app && bash scripts/run_tests.sh"
+          
+          echo "Simulating SSH into ${{ env.INSTANCE_IP }} and running agent-tests/test_fragile_sites.py"
+          echo "Logs will be sent to S3 bucket: ${{ env.S3_BUCKET }}"
+          
+          # For demonstration in this portfolio project, we show the command structure
+          # python3 scripts/run_tests.sh
+
+      - name: Terraform Destroy (Cleanup)
+        if: always()
+        run: terraform destroy -auto-approve
+        working-directory: terraform
