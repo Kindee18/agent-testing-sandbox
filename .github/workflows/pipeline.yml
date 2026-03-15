@@ -73,7 +73,7 @@ jobs:
       - name: Terraform Init
         run: |
           if [ "${{ env.AWS_MOCK_MODE }}" == "true" ]; then
-            python3 -c "import json; d={'variable': {'ami_id': {'default': 'ami-mock'}}, 'provider': {'aws': {'region': 'us-east-1', 'access_key': 'test', 'secret_key': 'test', 'skip_credentials_validation': True, 'skip_metadata_api_check': True, 'skip_requesting_account_id': True, 'endpoints': {'ec2': 'http://localhost:4566', 's3': 'http://localhost:4566', 'iam': 'http://localhost:4566', 'sts': 'http://localhost:4566'}}}} ; open('override.tf.json', 'w').write(json.dumps(d))"
+            python3 -c "import json; d={'variable': {'ami_id': {'default': 'ami-mock'}, 'ssh_public_key': {'default': 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDfC5ihS2AaxS3Y6xA3vCGvS9A6L/fAnYyV6KCiXqW3F4YmB+Y8Z4J/X5N7zX6qBv9A3vC5ihS2AaxS3Y6xA3vCGvS9A6L/fAnYyV6KCiXqW3F4YmB+Y8Z4J/X5N7zX6qBv9A3vC5ihS2AaxS3Y6xA3vCGvS9A6L/fAnYyV6KCiXqW3F4YmB+Y8Z4J/X5N7zX6qBv9A3vC5ihS2AaxS3Y6xA3vCGvS9A6L/fAnYyV6KCiXqW3F4YmB+Y8Z4J/X5N7zX6qBv9 mockup@localhost'}}, 'provider': {'aws': {'region': 'us-east-1', 'access_key': 'test', 'secret_key': 'test', 'skip_credentials_validation': True, 'skip_metadata_api_check': True, 'skip_requesting_account_id': True, 's3_use_path_style': True, 'endpoints': {'ec2': 'http://localhost:4566', 's3': 'http://localhost:4566', 'iam': 'http://localhost:4566', 'sts': 'http://localhost:4566'}}}} ; open('override.tf.json', 'w').write(json.dumps(d))"
           fi
           terraform init
         working-directory: terraform
