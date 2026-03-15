@@ -27,3 +27,9 @@ variable "ssh_public_key" {
   type        = string
   default     = ""
 }
+
+variable "ami_id" {
+  description = "Optional AMI ID to override the default Ubuntu AMI"
+  type        = string
+  default     = null
+}

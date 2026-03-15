@@ -104,6 +104,7 @@ data "aws_caller_identity" "current" {}
 
 # --- EC2 Instance ---
 data "aws_ami" "ubuntu" {
+  count       = var.ami_id == null ? 1 : 0
   most_recent = true
   owners      = ["099720109477"] # Canonical
 
@@ -114,7 +115,7 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_instance" "agent_runner" {
-  ami                    = data.aws_ami.ubuntu.id
+  ami                    = var.ami_id != null ? var.ami_id : data.aws_ami.ubuntu[0].id
   instance_type          = var.instance_type
   subnet_id              = module.vpc.public_subnet_id
   vpc_security_group_ids = [aws_security_group.agent_runner.id]

@@ -73,7 +73,7 @@ jobs:
       - name: Terraform Init
         run: |
           if [ "${{ env.AWS_MOCK_MODE }}" == "true" ]; then
-            python3 -c "import json; d={'provider': {'aws': {'region': 'us-east-1', 'access_key': 'test', 'secret_key': 'test', 'skip_credentials_validation': True, 'skip_metadata_api_check': True, 'skip_requesting_account_id': True, 'endpoints': {'ec2': 'http://localhost:4566', 's3': 'http://localhost:4566', 'iam': 'http://localhost:4566', 'sts': 'http://localhost:4566'}}}} ; open('override.tf.json', 'w').write(json.dumps(d))"
+            python3 -c "import json; d={'variable': {'ami_id': {'default': 'ami-mock'}}, 'provider': {'aws': {'region': 'us-east-1', 'access_key': 'test', 'secret_key': 'test', 'skip_credentials_validation': True, 'skip_metadata_api_check': True, 'skip_requesting_account_id': True, 'endpoints': {'ec2': 'http://localhost:4566', 's3': 'http://localhost:4566', 'iam': 'http://localhost:4566', 'sts': 'http://localhost:4566'}}}} ; open('override.tf.json', 'w').write(json.dumps(d))"
           fi
           terraform init
         working-directory: terraform
