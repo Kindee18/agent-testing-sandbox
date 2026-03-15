@@ -42,30 +42,46 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
 
+      - name: Install Host Dependencies (Mock Mode Only)
+        if: env.AWS_MOCK_MODE == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip
+          pip3 install pytest pyyaml
+
+      - name: Wait for LocalStack Readiness
+        if: env.AWS_MOCK_MODE == 'true'
+        run: |
+          echo "Waiting for LocalStack gateway..."
+          until curl -s http://localhost:4566/_localstack/health | grep -q '"s3": "running"'; do
+            sleep 2
+          done
+          echo "LocalStack is ready!"
+
       - name: Terraform Init
         run: |
           # If in mock mode, create an override file for LocalStack
           if [ "${{ env.AWS_MOCK_MODE }}" == "true" ]; then
             cat <<EOF > override.tf.json
-            {
-              "provider": {
-                "aws": {
-                  "region": "us-east-1",
-                  "access_key": "test",
-                  "secret_key": "test",
-                  "skip_credentials_validation": true,
-                  "skip_metadata_api_check": true,
-                  "skip_requesting_account_id": true,
-                  "endpoints": {
-                    "ec2": "http://localhost:4566",
-                    "s3": "http://localhost:4566",
-                    "iam": "http://localhost:4566",
-                    "sts": "http://localhost:4566"
-                  }
-                }
-              }
-            }
-            EOF
+{
+  "provider": {
+    "aws": {
+      "region": "us-east-1",
+      "access_key": "test",
+      "secret_key": "test",
+      "skip_credentials_validation": true,
+      "skip_metadata_api_check": true,
+      "skip_requesting_account_id": true,
+      "endpoints": {
+        "ec2": "http://localhost:4566",
+        "s3": "http://localhost:4566",
+        "iam": "http://localhost:4566",
+        "sts": "http://localhost:4566"
+      }
+    }
+  }
+}
+EOF
           fi
           terraform init
         working-directory: terraform
