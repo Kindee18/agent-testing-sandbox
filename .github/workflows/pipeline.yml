@@ -44,9 +44,28 @@ jobs:
 
       - name: Terraform Init
         run: |
-          # If in mock mode, use the local provider example
+          # If in mock mode, create an override file for LocalStack
           if [ "${{ env.AWS_MOCK_MODE }}" == "true" ]; then
-            cp local_provider.tf.example local_provider.tf
+            cat <<EOF > override.tf.json
+            {
+              "provider": {
+                "aws": {
+                  "region": "us-east-1",
+                  "access_key": "test",
+                  "secret_key": "test",
+                  "skip_credentials_validation": true,
+                  "skip_metadata_api_check": true,
+                  "skip_requesting_account_id": true,
+                  "endpoints": {
+                    "ec2": "http://localhost:4566",
+                    "s3": "http://localhost:4566",
+                    "iam": "http://localhost:4566",
+                    "sts": "http://localhost:4566"
+                  }
+                }
+              }
+            }
+            EOF
           fi
           terraform init
         working-directory: terraform
@@ -71,8 +90,8 @@ jobs:
           known_hosts: unnecessary
           if_key_exists: replace
 
-      - name: Wait for Cloud-Init
-        run: sleep 45 # wait for readiness
+      - name: Wait for Cloud-Init/Readiness
+        run: sleep 120 # Real AWS instances need more time for Docker/Python install
 
       - name: Deploy and Run Agent Tests
         run: |
