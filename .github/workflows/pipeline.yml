@@ -51,12 +51,24 @@ jobs:
 
       - name: Wait for LocalStack Readiness
         if: env.AWS_MOCK_MODE == 'true'
+        timeout-minutes: 5
         run: |
           echo "Waiting for LocalStack gateway..."
-          until curl -s http://localhost:4566/_localstack/health | grep -q '"s3": "running"'; do
-            sleep 2
+          max_retries=60
+          count=0
+          until curl -s http://localhost:4566/_localstack/health | grep -q '"s3": "running"' || [ $count -eq $max_retries ]; do
+            sleep 5
+            count=$((count + 1))
+            if [ $((count % 6)) -eq 0 ]; then
+              echo "Still waiting for LocalStack (Attempt $count/$max_retries)..."
+              curl -s http://localhost:4566/_localstack/health || echo "Endpoint not responding yet"
+            fi
           done
-          echo "LocalStack is ready!"
+          if [ $count -eq $max_retries ]; then
+            echo "LocalStack failed to become ready in time. Proceeding with caution..."
+          else
+            echo "LocalStack is ready!"
+          fi
 
       - name: Terraform Init
         run: |
