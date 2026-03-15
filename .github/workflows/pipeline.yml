@@ -43,14 +43,14 @@ jobs:
         uses: hashicorp/setup-terraform@v2
 
       - name: Install Host Dependencies (Mock Mode Only)
-        if: env.AWS_MOCK_MODE == 'true'
+        if: ${{ env.AWS_MOCK_MODE == 'true' }}
         run: |
           sudo apt-get update
           sudo apt-get install -y python3-pip
           pip3 install pytest pyyaml
 
       - name: Wait for LocalStack Readiness
-        if: env.AWS_MOCK_MODE == 'true'
+        if: ${{ env.AWS_MOCK_MODE == 'true' }}
         run: |
           echo "Waiting for LocalStack gateway..."
           until curl -s http://localhost:4566/_localstack/health | grep -q '"s3": "running"'; do
@@ -60,7 +60,6 @@ jobs:
 
       - name: Terraform Init
         run: |
-          # If in mock mode, create an override file for LocalStack
           if [ "${{ env.AWS_MOCK_MODE }}" == "true" ]; then
             cat <<EOF > override.tf.json
 {
@@ -99,7 +98,7 @@ EOF
         working-directory: terraform
 
       - name: Setup SSH Key
-        if: env.AWS_MOCK_MODE == 'false'
+        if: ${{ env.AWS_MOCK_MODE == 'false' }}
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -113,7 +112,6 @@ EOF
         run: |
           if [ "${{ env.AWS_MOCK_MODE }}" == "true" ]; then
             echo "Running tests in Mock Mode (Bypassing SSH)..."
-            # In mock mode, we run the tests locally against LocalStack
             bash scripts/run_tests.sh
           else
             echo "Deploying code to ${{ env.INSTANCE_IP }} via SSH..."
