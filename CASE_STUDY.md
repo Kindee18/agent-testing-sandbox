@@ -74,9 +74,15 @@ To solve the problem of hardcoded endpoints in LocalStack, I utilized `override.
 
 | Challenge | Impact | My Technical Solution |
 | :--- | :--- | :--- |
-| **Cloud-Init Lag** | Tests failed because SSH was ready before Docker was installed. | I implemented a 120-second "Readiness Wait" and hardened the shell-init scripts to ensure 100% environment readiness. |
-| **Provider Conflicts** | Terraform complained about multiple provider instances for AWS. | I switched from file-copying logic to `override.tf.json`, which I integrated because it is natively prioritized by Terraform’s loading order. |
-| **State Drift** | Local Git state didn't match the API-driven remote pushes. | I implemented a "Sync-First" delivery workflow, ensuring I finalized all local commits before handing over the project. |
+| **LocalStack v4 Latency** | The health-check loop hung indefinitely because v4 uses 'available' instead of 'running'. | I implemented a multi-status Regex match (`running|available`) and added a 5-minute safety timeout to prevent workflow hangs. |
+| **AMI Lookup Failure** | Terraform crashed in Mock Mode because LocalStack lacks real Ubuntu AMI metadata. | I introduced a conditional `ami_id` variable and utilized `override.tf.json` to inject `ami-mock`, bypassing the lookup. |
+| **IAM/S3 Consistency** | Race conditions caused 'Not Found' errors during bucket/instance creation. | I enabled `s3_use_path_style` and disabled `iam_instance_profile` in Mock Mode to skip LocalStack's eventual consistency bottlenecks. |
+| **Output Pollution** | Debug metadata in Terraform output broke environment variable extraction. | I disabled the `terraform_wrapper`, ensuring 100% clean raw strings for the `GITHUB_ENV` mapping step. |
+
+### 6.1 Defensive Engineering for Mock Environments
+To achieve a "Green Build," I moved beyond simple automation into **Defensive Engineering**. 
+- **Dynamic Key Generation**: Instead of hardcoding SSH keys (which often fail validation), my pipeline now runs `ssh-keygen` on-the-fly to provide mathematically valid keys to the simulator.
+- **Provider Injection**: I used Python-based JSON generation to dynamically strip production features (like IAM profiles) when running in LocalStack, ensuring the same core HCL code remains 100% portable.
 
 ---
 
