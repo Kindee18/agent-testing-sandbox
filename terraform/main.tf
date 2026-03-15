@@ -4,11 +4,24 @@ module "vpc" {
   environment  = var.environment
 }
 
-# --- Security Groups ---
+# --- Security ---
+resource "aws_key_pair" "agent_deploy_key" {
+  key_name   = "${var.project_name}-deploy-key"
+  public_key = var.ssh_public_key
+}
+
 resource "aws_security_group" "agent_runner" {
   name        = "${var.project_name}-runner-sg"
   description = "Security group for AI agent runner instance"
   vpc_id      = module.vpc.vpc_id
+
+  # Allow SSH access for deployment
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # In production, restrict this to GitHub runner IPs or a VPN
+  }
 
   # Allow outbound internet access for web scraping
   egress {
@@ -106,6 +119,7 @@ resource "aws_instance" "agent_runner" {
   subnet_id              = module.vpc.public_subnet_id
   vpc_security_group_ids = [aws_security_group.agent_runner.id]
   iam_instance_profile   = aws_iam_instance_profile.runner_profile.name
+  key_name               = aws_key_pair.agent_deploy_key.key_name
 
   user_data = <<-EOF
               #!/bin/bash

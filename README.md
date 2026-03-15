@@ -50,9 +50,24 @@ agent-testing-sandbox/
 
 ## Prerequisites
 - AWS Account with `AdministratorAccess` (for demo purposes)
-- GitHub Repository Secrets:
+- **GitHub CLI (`gh`)**: Installed and authenticated (`gh auth login`).
+
+## Automated Setup (When AWS is ready)
+Instead of manual configuration, run this script to generate keys and set GitHub secrets automatically:
+```bash
+bash scripts/setup_secrets.sh
+```
+
+## Manual Configuration (Optional)
+If you prefer manual setup, configure these GitHub Repository Secrets:
   - `AWS_ACCESS_KEY_ID`
   - `AWS_SECRET_ACCESS_KEY`
+  - `SSH_PRIVATE_KEY`: Your private SSH key for EC2 access.
+- Terraform Variables:
+  - `ssh_public_key`: Set this in your Terraform variables or as a GitHub secret `TF_VAR_ssh_public_key`.
+
+> [!NOTE]
+> If AWS Secrets are not provided, the pipeline will automatically switch to **Mock Mode** using LocalStack.
 
 ## Local Testing (No AWS Required)
 If you do not have a working AWS account or want to verify the logic locally:
