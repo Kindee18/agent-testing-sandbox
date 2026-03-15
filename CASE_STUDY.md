@@ -31,9 +31,6 @@ graph TD
     J --> K[Upload Logs to S3];
     K --> L[Terraform Destroy];
     G --> L;
-    
-    style C fill:#f9f,stroke:#333
-    style D fill:#bbf,stroke:#333
 ```
 
 ---
