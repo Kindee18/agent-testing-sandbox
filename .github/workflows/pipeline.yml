@@ -55,7 +55,7 @@ jobs:
           echo "Waiting for LocalStack gateway..."
           until curl -s http://localhost:4566/_localstack/health | grep -q '"s3": "running"'; do
             sleep 2
-          Done
+          done
           echo "LocalStack is ready!"
 
       - name: Terraform Init
