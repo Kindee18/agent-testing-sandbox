@@ -114,9 +114,13 @@ data "aws_ami" "ubuntu" {
   }
 }
 
-resource "aws_instance" "agent_runner" {
+resource "aws_spot_instance_request" "agent_runner" {
   ami                    = var.ami_id != null ? var.ami_id : data.aws_ami.ubuntu[0].id
   instance_type          = var.instance_type
+  spot_price             = var.spot_price
+  wait_for_fulfillment   = true
+  spot_type              = "one-time"
+
   subnet_id              = module.vpc.public_subnet_id
   vpc_security_group_ids = [aws_security_group.agent_runner.id]
   iam_instance_profile   = aws_iam_instance_profile.runner_profile.name
@@ -131,7 +135,7 @@ resource "aws_instance" "agent_runner" {
               EOF
 
   tags = {
-    Name        = "${var.project_name}-runner"
+    Name        = "${var.project_name}-runner-spot"
     Environment = var.environment
   }
 }

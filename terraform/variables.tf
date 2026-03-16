@@ -22,6 +22,12 @@ variable "instance_type" {
   default     = "t3.micro"
 }
 
+variable "spot_price" {
+  description = "Maximum price to pay for spot instances"
+  type        = string
+  default     = "0.01"
+}
+
 variable "ssh_public_key" {
   description = "Optional SSH public key for debug access"
   type        = string
