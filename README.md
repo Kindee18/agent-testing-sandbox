@@ -9,6 +9,11 @@ This project demonstrates a production-grade DevOps workflow for testing AI agen
 - **CI/CD Integration**: Fully automated via GitHub Actions.
 - **Secure by Design**: Restricted security groups and IAM roles with least-privilege access.
 - **Cost Efficient**: Designed to run within the AWS Free Tier (t3.micro).
+- **Advanced Engineering Tier**:
+    - **Site Health Checks**: Distinguishes between Agent bugs and Website downtime.
+    - **Proactive Alerting**: Instant Slack/Discord notifications on failures.
+    - **Spot Instance Optimization**: Uses AWS Spot instances to reduce costs by 90%.
+    - **Cost Estimation**: Automated Infracost "Price Checks" on Pull Requests.
 
 ## Tech Stack
 - **Cloud**: AWS (VPC, EC2, S3, IAM)
@@ -52,11 +57,13 @@ agent-testing-sandbox/
 - AWS Account with `AdministratorAccess` (for demo purposes)
 - **GitHub CLI (`gh`)**: Installed and authenticated (`gh auth login`).
 
-## Automated Setup (When AWS is ready)
-Instead of manual configuration, run this script to generate keys and set GitHub secrets automatically:
 ```bash
 bash scripts/setup_secrets.sh
 ```
+
+## 🛠️ Advanced Integrations (Slack & Infracost)
+For detailed instructions on setting up Slack alerts and automated price checks, see the:
+**[Project Setup Guide](SETUP_GUIDE.md)**
 
 ## Manual Configuration (Optional)
 If you prefer manual setup, configure these GitHub Repository Secrets:
