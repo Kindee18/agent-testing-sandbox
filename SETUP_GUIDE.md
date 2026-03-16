@@ -5,7 +5,6 @@ This guide will help you configure the external integrations (Slack/Discord and 
 ## 1. Slack Alerting Setup (Recommended)
 To receive instant failure notifications in Slack:
 1.  Navigate to [api.slack.com/apps](https://api.slack.com/apps) and sign in to your Slack account.
- and sign in to your Slack account.
 2.  Click **Create New App** -> **From Scratch**.
 3.  Name it "TinyFish Agent" and select your workspace.
 4.  Under **Add features and functionality**, select **Incoming Webhooks**.
