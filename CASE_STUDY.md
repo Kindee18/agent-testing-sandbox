@@ -85,6 +85,8 @@ To solve the problem of hardcoded endpoints in LocalStack, I utilized `override.
 | **Silent Failures and Alerting** | Automated agents often fail silently in background jobs, leading to delayed repairs. | I integrated a `send_alert` utility tied to the health-check tier, providing instant Slack/Discord notifications for critical failures. |
 | **Spot Instance Volatility** | Ephemeral workflows are sensitive to cloud costs, but spot instances can be interrupted. | I transitioned the infrastructure to `aws_spot_instance_request` with `wait_for_fulfillment`, achieving ~90% cost savings while ensuring the pipeline only proceeds once the request is granted. |
 | **Pre-emptive Cost Visibility** | DevOps teams often discover cost spikes after the bill arrives, rather than before deployment. | I integrated **Infracost** into the CI/CD pipeline, enabling automated cost-diff comments on every Pull Request to prevent budget overruns. |
+| **Action Versioning Typos** | Workflow failed during initialization due to `actions/checkout@v6` (which does not exist). | I corrected the action version to `v4`, restoring workflow stability and ensuring Node.js 24 compliance. |
+| **LocalStack Resource Mismatch** | `aws_spot_instance_request` broke the `override.tf.json` logic used for Mock Mode. | I reverted to `aws_instance` with `instance_market_options`, which provides the same Spot benefits while maintaining 100% compatibility with local overrides. |
 
 ### 6.1 Defensive Engineering for Mock Environments
 To achieve a "Green Build," I moved beyond simple automation into **Defensive Engineering**. 

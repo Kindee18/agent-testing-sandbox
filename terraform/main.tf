@@ -114,17 +114,20 @@ data "aws_ami" "ubuntu" {
   }
 }
 
-resource "aws_spot_instance_request" "agent_runner" {
+resource "aws_instance" "agent_runner" {
   ami                    = var.ami_id != null ? var.ami_id : data.aws_ami.ubuntu[0].id
   instance_type          = var.instance_type
-  spot_price             = var.spot_price
-  wait_for_fulfillment   = true
-  spot_type              = "one-time"
-
   subnet_id              = module.vpc.public_subnet_id
   vpc_security_group_ids = [aws_security_group.agent_runner.id]
   iam_instance_profile   = aws_iam_instance_profile.runner_profile.name
   key_name               = aws_key_pair.agent_deploy_key.key_name
+
+  instance_market_options {
+    market_type = "spot"
+    spot_options {
+      max_price = var.spot_price
+    }
+  }
 
   user_data = <<-EOF
               #!/bin/bash
