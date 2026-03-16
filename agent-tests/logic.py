@@ -6,6 +6,10 @@ try:
 except ImportError:
     requests = None
 
+class SiteFailure(Exception):
+    """Custom exception when a target site is down."""
+    pass
+
 def check_site_health(url):
     """
     Performs a pre-check to distinguish between Site Downtime and Agent Failures.
@@ -47,7 +51,7 @@ def mock_agent_extraction(url):
     if not is_healthy:
         error_msg = f"CRITICAL: Extraction blocked by Site Failure. Reason: {message}"
         send_alert(error_msg)
-        raise Exception(error_msg)
+        raise SiteFailure(error_msg)
 
     time.sleep(1) # Reduced lead time for testing
     if "fragile-site.com" in url:

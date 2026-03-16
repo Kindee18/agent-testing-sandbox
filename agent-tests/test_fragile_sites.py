@@ -1,12 +1,15 @@
 import pytest
-from logic import mock_agent_extraction
+from logic import mock_agent_extraction, SiteFailure
 
 def test_price_extraction():
     """
     Validate that the agent can still extract prices accurately.
     """
     url = "https://fragile-site.com/products/test-item"
-    data = mock_agent_extraction(url)
+    try:
+        data = mock_agent_extraction(url)
+    except SiteFailure as e:
+        pytest.skip(f"Skipping extraction test: {e}")
     
     assert data is not None
     assert "price" in data
@@ -18,7 +21,10 @@ def test_availability_extraction():
     Validate that the agent can still extract availability status.
     """
     url = "https://fragile-site.com/products/test-item"
-    data = mock_agent_extraction(url)
+    try:
+        data = mock_agent_extraction(url)
+    except SiteFailure as e:
+        pytest.skip(f"Skipping availability test: {e}")
     
     assert data is not None
     assert "availability" in data
@@ -31,7 +37,7 @@ def test_site_health_failure():
     """
     url = "https://down.fragile-site.com/products/test-item"
     
-    with pytest.raises(Exception) as excinfo:
+    with pytest.raises(SiteFailure) as excinfo:
         mock_agent_extraction(url)
     
     assert "Site Failure" in str(excinfo.value)
@@ -44,7 +50,7 @@ def test_alert_triggering(capsys):
     """
     url = "https://down.fragile-site.com/products/test-item"
     
-    with pytest.raises(Exception):
+    with pytest.raises(SiteFailure):
         mock_agent_extraction(url)
     
     captured = capsys.readouterr()
