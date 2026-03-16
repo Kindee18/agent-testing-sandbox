@@ -82,6 +82,7 @@ To solve the problem of hardcoded endpoints in LocalStack, I utilized `override.
 | **IAM/S3 Consistency** | Race conditions caused 'Not Found' errors during bucket/instance creation. | I enabled `s3_use_path_style` and disabled `iam_instance_profile` in Mock Mode to skip LocalStack's eventual consistency bottlenecks. |
 | **Output Pollution** | Debug metadata in Terraform output broke environment variable extraction. | I disabled the `terraform_wrapper`, ensuring 100% clean raw strings for the `GITHUB_ENV` mapping step. |
 | **Site Reliability Differentiation** | CI/CD failures were ambiguous; it was hard to tell if the Agent broke or if the target site was just down. | I implemented a `check_site_health` pre-extraction tier to distinguish between Site Failure (HTTP 503) and Agent Logic bugs. |
+| **Silent Failures and Alerting** | Automated agents often fail silently in background jobs, leading to delayed repairs. | I integrated a `send_alert` utility tied to the health-check tier, providing instant Slack/Discord notifications for critical failures. |
 
 ### 6.1 Defensive Engineering for Mock Environments
 To achieve a "Green Build," I moved beyond simple automation into **Defensive Engineering**. 

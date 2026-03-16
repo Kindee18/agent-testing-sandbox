@@ -38,6 +38,19 @@ def test_site_health_failure():
     assert "HTTP 503" in str(excinfo.value)
     print("Site health failure correctly identified.")
 
+def test_alert_triggering(capsys):
+    """
+    Validate that an alert is triggered in the logs when a site failure occurs.
+    """
+    url = "https://down.fragile-site.com/products/test-item"
+    
+    with pytest.raises(Exception):
+        mock_agent_extraction(url)
+    
+    captured = capsys.readouterr()
+    assert "Alert triggered" in captured.out or "MOCK: Sending Slack alert" in captured.out
+    print("Alert triggering verified in logs.")
+
 if __name__ == "__main__":
     # For manual local testing
     pytest.main([__file__])
