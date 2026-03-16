@@ -51,7 +51,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Check for AWS Credentials
         id: check_aws
@@ -67,7 +67,7 @@ jobs:
           fi
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v4
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
 
