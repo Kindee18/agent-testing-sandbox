@@ -1,3 +1,4 @@
+import pytest
 from logic import mock_agent_extraction
 
 def test_price_extraction():
@@ -23,6 +24,19 @@ def test_availability_extraction():
     assert "availability" in data
     assert data["availability"] == "In Stock"
     print(f"Availability extraction test passed: {data['availability']}")
+
+def test_site_health_failure():
+    """
+    Validate that the agent correctly identifies a Site Failure (HTTP 503).
+    """
+    url = "https://down.fragile-site.com/products/test-item"
+    
+    with pytest.raises(Exception) as excinfo:
+        mock_agent_extraction(url)
+    
+    assert "Site Failure" in str(excinfo.value)
+    assert "HTTP 503" in str(excinfo.value)
+    print("Site health failure correctly identified.")
 
 if __name__ == "__main__":
     # For manual local testing

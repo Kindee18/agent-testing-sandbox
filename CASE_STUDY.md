@@ -81,6 +81,7 @@ To solve the problem of hardcoded endpoints in LocalStack, I utilized `override.
 | **AMI Lookup Failure** | Terraform crashed in Mock Mode because LocalStack lacks real Ubuntu AMI metadata. | I introduced a conditional `ami_id` variable and utilized `override.tf.json` to inject `ami-mock`, bypassing the lookup. |
 | **IAM/S3 Consistency** | Race conditions caused 'Not Found' errors during bucket/instance creation. | I enabled `s3_use_path_style` and disabled `iam_instance_profile` in Mock Mode to skip LocalStack's eventual consistency bottlenecks. |
 | **Output Pollution** | Debug metadata in Terraform output broke environment variable extraction. | I disabled the `terraform_wrapper`, ensuring 100% clean raw strings for the `GITHUB_ENV` mapping step. |
+| **Site Reliability Differentiation** | CI/CD failures were ambiguous; it was hard to tell if the Agent broke or if the target site was just down. | I implemented a `check_site_health` pre-extraction tier to distinguish between Site Failure (HTTP 503) and Agent Logic bugs. |
 
 ### 6.1 Defensive Engineering for Mock Environments
 To achieve a "Green Build," I moved beyond simple automation into **Defensive Engineering**. 
