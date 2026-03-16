@@ -7,7 +7,33 @@ on:
     branches: [ main ]
 
 
+permissions:
+  contents: read
+  pull-requests: write # Required for Infracost to comment on PRs
+
 jobs:
+  cost-check:
+    name: Cost Estimation (Infracost)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Setup Infracost
+        uses: infracost/actions/setup@v3
+        with:
+          api-key: ${{ secrets.INFRACOST_API_KEY }}
+      - name: Generate Infracost JSON
+        run: |
+          infracost breakdown --path terraform/ \
+                            --format json \
+                            --out-file /tmp/infracost.json
+      - name: Post Infracost Comment
+        uses: infracost/actions/comment@v3
+        with:
+          path: /tmp/infracost.json
+          behavior: update
+
   sandbox-test:
     runs-on: ubuntu-latest
     env:
