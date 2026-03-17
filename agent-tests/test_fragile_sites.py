@@ -1,5 +1,6 @@
 import pytest
 from logic import mock_agent_extraction, SiteFailure
+from unittest.mock import patch
 
 def test_price_extraction():
     """
@@ -44,18 +45,25 @@ def test_site_health_failure():
     assert "HTTP 503" in str(excinfo.value)
     print("Site health failure correctly identified.")
 
-def test_alert_triggering(capsys):
+def test_alert_triggering(mock_alerts):
     """
-    Validate that an alert is triggered in the logs when a site failure occurs.
+    Validate that an alert is triggered when a site failure occurs.
     """
     url = "https://down.fragile-site.com/products/test-item"
     
     with pytest.raises(SiteFailure):
         mock_agent_extraction(url)
     
-    captured = capsys.readouterr()
-    assert "Alert triggered" in captured.out or "MOCK: Sending Slack alert" in captured.out
-    print("Alert triggering verified in logs.")
+    mock_alerts.assert_called_once()
+    args, kwargs = mock_alerts.call_args
+    assert "Site is unreachable" in args[0]
+    print("Alert triggering verified via mock.")
+
+@pytest.fixture(autouse=True)
+def mock_alerts():
+    """Automatically mock send_alert for all tests to prevent log noise."""
+    with patch("logic.send_alert") as mock:
+        yield mock
 
 if __name__ == "__main__":
     # For manual local testing
