@@ -49,6 +49,7 @@ jobs:
           - 4566:4566
         env:
           SERVICES: s3,ec2,iam,sts
+          LOCALSTACK_ACKNOWLEDGE_ACCOUNT_REQUIREMENT: "1"
 
     steps:
       - name: Checkout Code
