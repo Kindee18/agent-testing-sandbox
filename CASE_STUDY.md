@@ -88,6 +88,7 @@ To solve the problem of hardcoded endpoints in LocalStack, I utilized `override.
 | **Action Versioning Typos** | Workflow failed during initialization due to `actions/checkout@v6` (which does not exist). | I corrected the action version to `v4`, restoring workflow stability and ensuring Node.js 24 compliance. |
 | **LocalStack Resource Mismatch** | `aws_spot_instance_request` broke the `override.tf.json` logic used for Mock Mode. | I reverted to `aws_instance` with `instance_market_options`, which provides the same Spot benefits while maintaining 100% compatibility with local overrides. |
 | **False-Positive Failures** | External site downtime (HTTP 503) was crashing the entire CI/CD pipeline. | I introduced a custom `SiteFailure` exception and updated the test cases to use `pytest.skip` when detected, ensuring the pipeline stays green while still firing alerts to the DevOps team. |
+| **LocalStack Auth Requirement** | The LocalStack v4 service container unexpectedly failed to initialize due to a newly introduced account requirement. | I swiftly added the `LOCALSTACK_ACKNOWLEDGE_ACCOUNT_REQUIREMENT=1` flag to the CI/CD service environment, restoring full mock-mode functionality without needing a paid account. |
 
 ### 6.1 Defensive Engineering for Mock Environments
 To achieve a "Green Build," I moved beyond simple automation into **Defensive Engineering**. 
